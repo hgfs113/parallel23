@@ -118,13 +118,11 @@ Mat Backend::compute_A(Mat &w){
     #pragma omp parallel for private(i) private(j)
     for (i = 1; i < M; ++i) {
         for (j = 1; j < N; ++j) {
-            if (i > 0 && j > 0 && i < M && j < N) {
-                Aw[i][j] = -1.0 / h1 * (
-                    a[i + 1][j] * (w[i + 1][j] - w[i][j]) / h1 - a[i][j] * (w[i][j] - w[i - 1][j]) / h1
-                ) - 1.0 / h2 * (
-                    b[i][j + 1] * (w[i][j + 1] - w[i][j]) / h2 - b[i][j] * (w[i][j] - w[i][j - 1]) / h2
-                );
-            }
+            Aw[i][j] = -1.0 / h1 * (
+                a[i + 1][j] * (w[i + 1][j] - w[i][j]) / h1 - a[i][j] * (w[i][j] - w[i - 1][j]) / h1
+            ) - 1.0 / h2 * (
+                b[i][j + 1] * (w[i][j + 1] - w[i][j]) / h2 - b[i][j] * (w[i][j] - w[i][j - 1]) / h2
+            );
         }
     }
     return Aw;
