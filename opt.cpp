@@ -7,7 +7,7 @@ void communicate(Mat w, Mat buf, MPI_Status* status, int M, int N, int worker_id
     }
     if (worker_id == 0) {
         for (int id = 1; id < num_workers; ++id) {
-            MPI_Recv(buf, ((M + 1) * (N + 1)), MPI_DOUBLE, id, 0, MPI_COMM_WORLD, status);
+            MPI_Recv(&buf[0], ((M + 1) * (N + 1)), MPI_DOUBLE, id, 0, MPI_COMM_WORLD, status);
             int i_grid, j_grid, i, j;
 
             int i_step = (M + 1) / grid_size;
@@ -39,9 +39,9 @@ void communicate(Mat w, Mat buf, MPI_Status* status, int M, int N, int worker_id
             }
         }
     } else {
-        MPI_Send(w, ((M + 1) * (N + 1)), MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+        MPI_Send(&w[0], ((M + 1) * (N + 1)), MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
     }
-    MPI_Bcast(w, ((M + 1) * (N + 1)), MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&w[0], ((M + 1) * (N + 1)), MPI_DOUBLE, 0, MPI_COMM_WORLD);
 }
 
 
