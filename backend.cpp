@@ -90,40 +90,42 @@ Backend::Backend(int M, int N): M(M), N(N) {
     eps = fmax(h1, h2);
     eps *= eps;
 
-    a = Mat(M + 1, std::vector<double>(N + 1));
-    b = Mat(M + 1, std::vector<double>(N + 1));
+    a = Mat((M + 1) * (N + 1));
+    b = Mat((M + 1) * (N + 1));
 
     int i, j;
     #pragma omp parallel for private(i) private(j)
     for (i = 0; i < M + 1; ++i) {
         for (j = 0; j < N + 1; ++j) {
-            a[i][j] = get_a(i, j);
-            b[i][j] = get_b(i, j);
+            a[i * (N + 1) + j] = get_a(i, j);
+            b[i * (N + 1) + j] = get_b(i, j);
         }
     }
 
-    B = Mat(M + 1, std::vector<double>(N + 1));
+    B = Mat((M + 1) * (N + 1));
     #pragma omp parallel for private(i) private(j)
     for (i = 0; i < M + 1; ++i) {
         for (j = 0; j < N + 1; ++j) {
-            B[i][j] = get_Fij(i, j);
+            B[i * (N + 1) + j] = get_Fij(i, j);
         }
     }
 }
 
 
-Mat Backend::compute_A(Mat &w){
-    Mat Aw(M + 1, std::vector<double>(N + 1));
+void Backend::compute_A(int i_low, int i_high, int j_low, int j_high, Mat &w, Mat& Aw){
     int i, j;
     #pragma omp parallel for private(i) private(j)
-    for (i = 1; i < M; ++i) {
-        for (j = 1; j < N; ++j) {
-            Aw[i][j] = -1.0 / h1 * (
-                a[i + 1][j] * (w[i + 1][j] - w[i][j]) / h1 - a[i][j] * (w[i][j] - w[i - 1][j]) / h1
+    for (i = i_low; i < i_high; ++i) {
+        for (j = j_low; j < j_high; ++j) {
+            if (i == 0 || j == 0 || i == M || j == N) {
+                continue;
+            }
+
+            Aw[i * (N + 1)  + j] = -1.0 / h1 * (
+                a[(i + 1) * (N + 1) + j] * (w[(i + 1) * (N + 1) + j] - w[i * (N + 1) + j]) / h1 - a[i * (N + 1) + j] * (w[i * (N + 1) + j] - w[(i - 1) * (N + 1) + j]) / h1
             ) - 1.0 / h2 * (
-                b[i][j + 1] * (w[i][j + 1] - w[i][j]) / h2 - b[i][j] * (w[i][j] - w[i][j - 1]) / h2
+                b[i * (N + 1) + j + 1] * (w[i * (N + 1) + j + 1] - w[i * (N + 1) + j]) / h2 - b[i * (N + 1) + j] * (w[i * (N + 1) + j] - w[i * (N + 1) + j - 1]) / h2
             );
         }
     }
-    return Aw;
 }

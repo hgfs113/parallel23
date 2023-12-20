@@ -1,4 +1,4 @@
-CC = g++
+CC = mpicxx
 CFLAGS = -std=c++17 -Xpreprocessor -fopenmp
 LDFLAGS = -lomp -L/opt/homebrew/opt/libomp/lib
 

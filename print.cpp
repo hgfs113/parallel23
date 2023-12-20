@@ -1,14 +1,14 @@
 #include "print.h"
 
 
-void fprint_mat(std::string fname, Mat& matrix, int precision) {
+void fprint_mat(std::string fname, Mat& matrix, int M, int N, int precision) {
     std::ofstream fout(fname);
     fout.precision(precision);
     fout << '[';
-    for (auto& row: matrix) {
+    for (int i = 0; i < M + 1; ++i) {
         fout << '[';
-        for (double elem: row) {
-            fout << elem << ',';
+        for (int j = 0; j < N + 1; ++j) {
+            fout << matrix[i * (N + 1) + j] << ',';
         }
         fout << "]," << std::endl;
     }

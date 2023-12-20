@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-typedef std::vector<std::vector<double> > Mat;
+typedef std::vector<double> Mat;
 
 
 class Backend {
@@ -44,7 +44,7 @@ class Backend {
 public:
     Backend(int M, int N);
 
-    Mat compute_A(Mat &w);
+    void compute_A(int i_low, int i_high, int j_low, int j_high, Mat &w, Mat& Aw);
 
     int get_M() const {
         return M;
